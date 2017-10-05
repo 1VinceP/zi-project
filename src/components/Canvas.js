@@ -31,10 +31,13 @@ class Canvas extends Component {
         this.canvasHex.height = height
         this.canvasCoordinates.width = width
         this.canvasCoordinates.height = height
+        // Get sets the top left corner of each canvas to 0, 0
         this.getCanvasPosition( this.canvasCoordinates )
+        // This will draw the hexes
         this.drawHexes();
     };
 
+    // This determines if it should change the highlighted hex
     shouldComponentUpdate( nextProps, nextState ) {
         if( nextState.currentHex !== this.state.currentHex ) {
             const { q, r, s, x, y } = nextState.currentHex
@@ -50,6 +53,7 @@ class Canvas extends Component {
             return false
     }
 
+    // This combines lots of functions and draws all of the hexes inside of the bottom canvas
     drawHexes() {
         const { width, height } = this.state.canvasSize
         const { hexWidth, hexHeight, vertDist, horizDist } = this.state.hexParams
@@ -115,6 +119,7 @@ class Canvas extends Component {
         ctx.closePath()
     };
 
+    // This puts the coords inside each hex
     drawHexCoordinates( canvasID, center, h ) {
         const ctx = canvasID.getContext('2d')
 
@@ -140,6 +145,7 @@ class Canvas extends Component {
         return this.Point( x, y )
     };
 
+    // This gets the size of each hex, and the distance between hexes
     getHexParams() {
         // KEY pointy or flat
 
@@ -158,6 +164,7 @@ class Canvas extends Component {
         return { hexWidth, hexHeight, vertDist, horizDist }
     };
 
+    // This sets a new canvas on top that will handle visual events, such as highlighting a selected hex 
     getCanvasPosition( canvasID ) {
         let rect = canvasID.getBoundingClientRect()
         this.setState({
@@ -165,7 +172,7 @@ class Canvas extends Component {
         })
     }
 
-    // This gets the center of each hex
+    // This gets the pixels in each hex
     hexToPixel( h ) {
         // KEY pointy or flat
 
@@ -184,14 +191,14 @@ class Canvas extends Component {
 
     // Finds a hexagon based on cursor position
     pixelToHex( p ) {
-        // KEY
         let size = this.state.hexSize
         let origin = this.state.hexOrigin
 
+        // KEY pointy or flat
         // flat
         // let q = ( p.x - origin.x ) * 2/3 / size
         // let r = ( -( p.x - origin.x ) / 3 + Math.sqrt(3)/3 * ( p.y - origin.y ) ) / size
-        // return Hex( q, r )
+        // return this.Hex( q, r, -q -r )
 
         // pointy
         let q = ( ( p.x - origin.x ) * Math.sqrt(3)/3 - ( p.y - origin.y ) / 3 ) / size
@@ -199,6 +206,7 @@ class Canvas extends Component {
         return this.Hex( q, r, -q -r )
     };
 
+    // This does... something. Something having to do with finding the three coords of each hex
     cubeRound( cube ) {
         let rx = Math.round( cube.q )
         let ry = Math.round( cube.r )
@@ -227,6 +235,7 @@ class Canvas extends Component {
         return { q, r, s }
     };
 
+    // finds the coordinates of the mouse, and sets the currently selected hex to state
     handleMouseMove( e ) {
         const { left, right, top, bottom } = this.state.canvasPosition
         let offsetX = e.pageX - left
@@ -243,7 +252,9 @@ class Canvas extends Component {
     render() {
         return(
             <div>
+                {/* This creates the bottom canvas, which contains all of the hexes */}
                 <canvas ref={ canvasHex => this.canvasHex = canvasHex } ></canvas>
+                {/* This creates the top canvas, which currently contains the highlight for the selected hex */}
                 <canvas ref={ canvasCoordinates => this.canvasCoordinates = canvasCoordinates } onMouseMove={ this.handleMouseMove } ></canvas>
             </div>
         )
